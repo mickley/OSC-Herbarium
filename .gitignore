@@ -1,0 +1,14 @@
+# Ignore R project hidden files
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+
+# Ignore R Markdown caches
+*_cache
+
+# Ignore R Markdown html files
+#*.html
+
+# Don't ignore R Notebooks
+#!*.nb.html
