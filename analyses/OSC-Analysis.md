@@ -1,7 +1,7 @@
 OSC Herbarium
 ================
 James Mickley
-January 20, 2020
+January 23, 2020
 
 ## Overview
 
@@ -11,6 +11,9 @@ What is this analysis about?
 
   - 
 ## Summaries
+
+A summary of the number of families, species, and specimens represented,
+along with stats for the most common families
 
 | Families | Species | Specimens |
 | -------: | ------: | --------: |
@@ -36,7 +39,7 @@ What is this analysis about?
 | Caryophyllaceae |     118 |      2365 |
 | Saxifragaceae   |      75 |      2118 |
 
-![](OSC-Analysis_files/figure-gfm/State_Summary-1.png)<!-- -->
+![](OSC-Analysis_files/figure-gfm/State_Map-1.png)<!-- -->
 
 ### Specimens and species by county
 

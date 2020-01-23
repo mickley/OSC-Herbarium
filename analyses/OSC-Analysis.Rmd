@@ -70,7 +70,7 @@ library(sf) # Needed to work with shapefiles
 # @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
 # Import datasets
-data <- read.csv("data/osc-vascularplants.csv")
+data <- read.csv("data/osc-plants.csv")
 
 # Import Oregon Counties shapefile
 or.counties <- read_sf("data/shapefiles/county.shp")
@@ -215,6 +215,8 @@ county.counts <- data %>%
 
 ## Summaries
 
+A summary of the number of families, species, and specimens represented, along with stats for the most common families
+
 ```{r State_Summary, echo = F, comment = ""}
 
 # Summarize total families, species, and specimens in dataset
@@ -263,7 +265,9 @@ data %>%
     kable(format = "markdown")  
 
 
+```
 
+```{r State_Map, echo = F, comment = ""}
 
 data %>%
     ggplot() + 
@@ -273,7 +277,6 @@ data %>%
         theme_cowplot() +
         ggplot.theme +
         map.theme
-
 
 ```
 
@@ -285,6 +288,7 @@ data %>%
 ## Sampling Biases
 
 ### Spatial
+
 
 ```{r Specimens_County, echo = F}
 
@@ -304,7 +308,7 @@ or.counties %>% left_join(county.counts) %>%
     
     # Add the outline of CT, with counties
     geom_sf(aes(fill = Specimens), color = "black") + 
-    geom_sf_label(aes(label = County), size = 4, fontface = "bold") + 
+    geom_sf_label(aes(label = County), size = 3, fontface = "bold") + 
     scale_fill_gradient(low = "lightgreen", high = "darkgreen") +
 
     theme_cowplot() +
@@ -436,21 +440,30 @@ data %>%
     summarize(Specimens = n()) %>%
     
     # Group by the number of specimens
-    group_by(Specimens) %>% 
+    #group_by(Specimens) %>% 
     
     # Summarize the number of species with a certain number of specimens
-    summarize(Species = n()) %>% 
+    #summarize(Species = n()) %>% 
     
-    mutate(MeanSpp = median(Species)) %>%
+    mutate(MedianSp = median(Specimens)) %>%
+  
     
-    ggplot(aes(x = Specimens, y = Species)) + 
+    ggplot(aes(x = Specimens)) + 
+  
+        geom_histogram(bins = 60, fill = "darkgreen", color = "black", 
+            alpha = 0.5) +
     
-        geom_bar(stat = "identity") + 
+        #geom_bar(stat = "identity") + 
     
-        geom_vline(aes(xintercept = MeanSpp), color = "red", size = 1.5) +
+        geom_vline(aes(xintercept = MedianSp), color = "red", size = 1.2) +
+  
+        scale_x_continuous(breaks = c(0, 12, 100, 200, 300, 400, 500)) +
+  
+        labs(x = "Number of Specimens", y = "Species") +
     
-    theme_cowplot() + 
-    ggplot.theme
+        theme_cowplot() + 
+  
+        ggplot.theme
 
 
 ```
@@ -461,11 +474,15 @@ data %>%
 data %>% 
     group_by(Species, LastCollected, Specimens) %>%
     summarize() %>% 
+    ungroup() %>%
     filter(Specimens <= 10) %>%
-    
+    mutate(MedianYr = median(LastCollected)) %>%
     ggplot(aes(x = LastCollected)) +
-        geom_histogram() + 
+        geom_histogram(bins = 30, color = "black", fill = "darkgreen", 
+              alpha = 0.5) + 
         #geom_jitter(alpha = 0.5)
+        labs(x = "Last Year Collected", y = "Species") +
+        geom_vline(aes(xintercept = MedianYr), color = "red", size = 1.2) +
         theme_cowplot() + 
         ggplot.theme
 
