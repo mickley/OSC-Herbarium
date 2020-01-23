@@ -296,7 +296,8 @@ data %>%
 
 county.counts %>%
     ggplot(aes(x = reorder(County, -Specimens), y = Specimens)) + 
-        geom_bar(stat = "identity") + 
+        geom_bar(stat = "identity", color = "darkgreen", fill = "darkgreen", 
+          alpha = 0.2) + 
         xlab("County") +
         theme_cowplot() + 
         ggplot.theme + 
@@ -309,7 +310,7 @@ or.counties %>% left_join(county.counts) %>%
     # Add the outline of CT, with counties
     geom_sf(aes(fill = Specimens), color = "black") + 
     geom_sf_label(aes(label = County), size = 3, fontface = "bold") + 
-    scale_fill_gradient(low = "lightgreen", high = "darkgreen") +
+    scale_fill_gradient(low = "darkseagreen1", high = "darkgreen") +
 
     theme_cowplot() +
     ggplot.theme +
@@ -329,7 +330,7 @@ or.counties %>%
         geom_sf(aes(fill = TotalSpp), color = "black") + 
     
         geom_sf_label(aes(label = County), size = 4, fontface = "bold") + 
-        scale_fill_gradient(low = "lightgreen", high = "darkgreen") +
+        scale_fill_gradient(low = "darkseagreen1", high = "darkgreen") +
         theme_cowplot() +
         ggplot.theme +
         map.theme
