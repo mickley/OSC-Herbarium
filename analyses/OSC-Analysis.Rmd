@@ -450,8 +450,8 @@ data %>%
     
     ggplot(aes(x = Specimens)) + 
   
-        geom_histogram(bins = 60, fill = "darkgreen", color = "black", 
-            alpha = 0.5) +
+        geom_histogram(bins = 60, fill = "darkgreen", color = "darkgreen", 
+            alpha = 0.2) +
     
         #geom_bar(stat = "identity") + 
     
@@ -459,7 +459,7 @@ data %>%
   
         scale_x_continuous(breaks = c(0, 12, 100, 200, 300, 400, 500)) +
   
-        labs(x = "Number of Specimens", y = "Species") +
+        labs(x = "Number of Specimens", y = "Number of Species") +
     
         theme_cowplot() + 
   
@@ -478,10 +478,10 @@ data %>%
     filter(Specimens <= 10) %>%
     mutate(MedianYr = median(LastCollected)) %>%
     ggplot(aes(x = LastCollected)) +
-        geom_histogram(bins = 30, color = "black", fill = "darkgreen", 
-              alpha = 0.5) + 
+        geom_histogram(bins = 30, color = "darkgreen", fill = "darkgreen", 
+              alpha = 0.2) + 
         #geom_jitter(alpha = 0.5)
-        labs(x = "Last Year Collected", y = "Species") +
+        labs(x = "Last Year Collected", y = "Number of Species") +
         geom_vline(aes(xintercept = MedianYr), color = "red", size = 1.2) +
         theme_cowplot() + 
         ggplot.theme
