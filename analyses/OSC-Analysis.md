@@ -1,7 +1,7 @@
 OSC Herbarium
 ================
 James Mickley
-January 23, 2020
+January 24, 2020
 
 ## Overview
 
@@ -104,16 +104,6 @@ that might be worth looking into.
     ##       n
     ##   <int>
     ## 1   755
-    ##  [1] "OccurrenceID"                  "Herbarium"                    
-    ##  [3] "Collection"                    "Catalog"                      
-    ##  [5] "Family"                        "Genus"                        
-    ##  [7] "ScientificName"                "SpecificEpithet"              
-    ##  [9] "YearCollected"                 "County"                       
-    ## [11] "DecimalLatitude"               "DecimalLongitude"             
-    ## [13] "CoordinateUncertaintyInMeters" "Decade"                       
-    ## [15] "Species"                       "Division"                     
-    ## [17] "Class"                         "Order"                        
-    ## [19] "Specimens"                     "LastCollected"
 
 ![](OSC-Analysis_files/figure-gfm/Undersampled_Species_LastCollected-2.png)<!-- -->
 

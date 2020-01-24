@@ -458,8 +458,6 @@ data %>%
     
         geom_vline(aes(xintercept = MedianSp), color = "red", size = 1.2) +
   
-        scale_x_continuous(breaks = c(0, 12, 100, 200, 300, 400, 500)) +
-  
         labs(x = "Number of Specimens", y = "Number of Species") +
     
         theme_cowplot() + 
@@ -495,8 +493,6 @@ data %>%
     filter(LastCollected < 1970) %>% 
     ungroup() %>%
     summarize(n = n())
-
-names(data)
 
 
 data %>%
