@@ -451,7 +451,7 @@ data %>%
     
     ggplot(aes(x = Specimens)) + 
   
-        geom_histogram(bins = 60, fill = "darkgreen", color = "darkgreen", 
+        geom_histogram(bins = 30, fill = "darkgreen", color = "darkgreen", 
             alpha = 0.2) +
     
         #geom_bar(stat = "identity") + 
