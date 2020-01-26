@@ -5,9 +5,8 @@ date: '`r format(Sys.Date(), "%B %d, %Y")`'
 graphics: yes
 output:
   github_document:
-    toc: yes
-    toc_depth: 5
-    pandoc_args: --webtex
+    toc: true
+    toc_depth: 3
   html_document:
     keep_md: yes
     theme: readable
@@ -43,8 +42,6 @@ knitr::opts_chunk$set(warning = F, message = F, collapse = T, cache = T,
 
 ```
 
-
-
 ## Overview
 
 What is this analysis about?
@@ -71,6 +68,7 @@ library(sf) # Needed to work with shapefiles
 
 # Import datasets
 data <- read.csv("data/osc-plants.csv")
+inat <- read.csv("data/oregon-inat.csv")
 
 # Import Oregon Counties shapefile
 or.counties <- read_sf("data/shapefiles/county.shp")
@@ -117,13 +115,7 @@ map.theme <- theme(
     axis.text = element_blank(),
     axis.line = element_blank(),
     axis.ticks = element_blank(),
-    axis.title = element_blank(),
-    
-    # Turn off gridlines, etc.
-    #panel.border = element_blank(),
-    #panel.grid.major = element_line(colour = "transparent"), 
-    #panel.grid.minor = element_line(colour = "transparent"), 
-    #panel.background = element_rect(fill = "transparent", colour = NA)
+    axis.title = element_blank()
     )
 
 
@@ -179,6 +171,13 @@ data <- data %>%
         LastCollected = first(YearCollected, order_by = desc(YearCollected))
         )
 
+inat <- inat %>%
+  
+    select(observed_on, latitude, longitude, family = taxon_family_name, 
+        species = taxon_species_name) %>%
+  
+    mutate(year = format(as.POSIXct(observed_on, format = "%m/%d/%y"), 
+        format = "%Y"))
 
 # Clean up the oregon counties shapefile
 or.counties <- or.counties %>% 
@@ -329,7 +328,7 @@ or.counties %>%
         
         geom_sf(aes(fill = TotalSpp), color = "black") + 
     
-        geom_sf_label(aes(label = County), size = 4, fontface = "bold") + 
+        geom_sf_label(aes(label = County), size = 3, fontface = "bold") + 
         scale_fill_gradient(low = "darkseagreen1", high = "darkgreen") +
         theme_cowplot() +
         ggplot.theme +
@@ -578,6 +577,23 @@ data %>%
 ```
 
 ## iNaturalist
+
+```{r iNat_Year, echo = F}
+
+inat %>% 
+    group_by(year) %>%
+    summarize(Observations = n()) %>%
+    filter(year > 2009, year < 2020) %>%
+    ggplot(aes(x = year, y = Observations)) + 
+        geom_bar(stat = "identity", color = "darkgreen", fill = "darkgreen", 
+            alpha = 0.2) + 
+        labs(x = "Year") +
+        theme_cowplot() + 
+        ggplot.theme
+
+
+```
+
 
 ### Temporal
 

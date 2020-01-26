@@ -1,7 +1,7 @@
 OSC Herbarium
 ================
 James Mickley
-January 24, 2020
+January 26, 2020
 
 ## Overview
 
@@ -119,6 +119,8 @@ that might be worth looking into.
 
 ## iNaturalist
 
+![](OSC-Analysis_files/figure-gfm/iNat_Year-1.png)<!-- -->
+
 ### Temporal
 
 show increase in sampling
@@ -154,29 +156,30 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
- [1] sf_0.8-0        taxize_0.9.91   knitr_1.26      cowplot_1.0.0  
+ [1] sf_0.8-0        taxize_0.9.91   knitr_1.27      cowplot_1.0.0  
  [5] forcats_0.4.0   stringr_1.4.0   dplyr_0.8.3     purrr_0.3.3    
  [9] readr_1.3.1     tidyr_1.0.0     tibble_2.1.3    ggplot2_3.2.1  
 [13] tidyverse_1.3.0
 
 loaded via a namespace (and not attached):
  [1] httr_1.4.1         jsonlite_1.6       foreach_1.4.7      bold_0.9.0        
- [5] modelr_0.1.5       assertthat_0.2.1   highr_0.8          cellranger_1.1.0  
- [9] yaml_2.2.0         pillar_1.4.2       backports_1.1.5    lattice_0.20-38   
-[13] glue_1.3.1         digest_0.6.23      rvest_0.3.5        colorspace_1.4-1  
-[17] htmltools_0.4.0    plyr_1.8.4         pkgconfig_2.0.3    httpcode_0.2.0    
-[21] broom_0.5.2        haven_2.2.0        scales_1.1.0       generics_0.0.2    
-[25] farver_2.0.1       withr_2.1.2        lazyeval_0.2.2     cli_1.1.0         
-[29] magrittr_1.5       crayon_1.3.4       readxl_1.3.1       evaluate_0.14     
-[33] fansi_0.4.0        fs_1.3.1           nlme_3.1-142       xml2_1.2.2        
-[37] class_7.3-15       tools_3.6.1        data.table_1.12.6  hms_0.5.2         
-[41] lifecycle_0.1.0    munsell_0.5.0      reprex_0.3.0       compiler_3.6.1    
-[45] e1071_1.7-3        rlang_0.4.2        classInt_0.4-2     units_0.6-5       
-[49] grid_3.6.1         iterators_1.0.12   rstudioapi_0.10    labeling_0.3      
-[53] rmarkdown_1.18     gtable_0.3.0       codetools_0.2-16   DBI_1.0.0         
-[57] reshape_0.8.8      curl_4.3           reshape2_1.4.3     R6_2.4.1          
-[61] zoo_1.8-6          lubridate_1.7.4    utf8_1.1.4         zeallot_0.1.0     
-[65] rprojroot_1.3-2    KernSmooth_2.23-16 ape_5.3            stringi_1.4.3     
-[69] parallel_3.6.1     crul_0.9.0         Rcpp_1.0.3         vctrs_0.2.0       
-[73] dbplyr_1.4.2       tidyselect_0.2.5   xfun_0.11         
+ [5] modelr_0.1.5       assertthat_0.2.1   highr_0.8          triebeard_0.3.0   
+ [9] urltools_1.7.3     cellranger_1.1.0   yaml_2.2.0         pillar_1.4.2      
+[13] backports_1.1.5    lattice_0.20-38    glue_1.3.1         digest_0.6.23     
+[17] rvest_0.3.5        colorspace_1.4-1   htmltools_0.4.0    plyr_1.8.4        
+[21] ritis_0.8.0        pkgconfig_2.0.3    httpcode_0.2.0     broom_0.5.2       
+[25] haven_2.2.0        scales_1.1.0       solrium_1.1.4      farver_2.0.1      
+[29] generics_0.0.2     withr_2.1.2        lazyeval_0.2.2     cli_1.1.0         
+[33] magrittr_1.5       crayon_1.3.4       readxl_1.3.1       evaluate_0.14     
+[37] fansi_0.4.0        fs_1.3.1           nlme_3.1-142       xml2_1.2.2        
+[41] class_7.3-15       tools_3.6.1        data.table_1.12.6  hms_0.5.2         
+[45] lifecycle_0.1.0    munsell_0.5.0      reprex_0.3.0       compiler_3.6.1    
+[49] e1071_1.7-3        rlang_0.4.2        classInt_0.4-2     units_0.6-5       
+[53] grid_3.6.1         iterators_1.0.12   rstudioapi_0.10    labeling_0.3      
+[57] rmarkdown_2.1      gtable_0.3.0       codetools_0.2-16   DBI_1.0.0         
+[61] reshape_0.8.8      curl_4.3           reshape2_1.4.3     R6_2.4.1          
+[65] zoo_1.8-6          lubridate_1.7.4    utf8_1.1.4         zeallot_0.1.0     
+[69] rprojroot_1.3-2    KernSmooth_2.23-16 ape_5.3            stringi_1.4.3     
+[73] parallel_3.6.1     crul_0.9.0         Rcpp_1.0.3         vctrs_0.2.0       
+[77] dbplyr_1.4.2       tidyselect_0.2.5   xfun_0.11         
 ```
