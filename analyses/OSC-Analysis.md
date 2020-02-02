@@ -1,19 +1,27 @@
 OSC Herbarium
 ================
 James Mickley
-January 26, 2020
+February 01, 2020
 
 ## Overview
 
-What is this analysis about?
+An exploratory analysis of the OSU herbarium’s vascular plants.
+
+Primarily, we’re concerned with understanding sampling in space, time,
+and across species.
 
 ### Summary of Results
 
   - 
 ## Summaries
 
+### Species
+
 A summary of the number of families, species, and specimens represented,
-along with stats for the most common families
+along with stats for the most common families.
+
+The OSC herbarium has just over 4500 species of vascular plant in Oregon
+with good data.
 
 | Families | Species | Specimens |
 | -------: | ------: | --------: |
@@ -38,33 +46,100 @@ along with stats for the most common families
 | Polemoniaceae   |      88 |      2376 |
 | Caryophyllaceae |     118 |      2365 |
 | Saxifragaceae   |      75 |      2118 |
+| Liliaceae       |      63 |      1674 |
+| Hydrophyllaceae |      49 |      1668 |
+| Juncaceae       |      71 |      1609 |
+
+### Locations
+
+A map of all the specimen records to look at sampling intensity across
+space.
+
+It looks like there’s less sampling in the mountains, unsurprisingly.
 
 ![](OSC-Analysis_files/figure-gfm/State_Map-1.png)<!-- -->
 
-### Specimens and species by county
+### Collectors
+
+A list of important collectors for Oregon specimens in OSC, with active
+dates.
+
+Morton Peck of WILLU tops the list (Manual of the Higher Plants of OR).
+Louis Henderson of UofO is second, and Richard Halse is third.
+
+Some great information on the background of these collectors is
+[here](https://bpp.oregonstate.edu/herbarium/databases/collectors-specimen-database).
+
+| Collector         | Specimens | NumSpecies | FirstAccession | LastAccession |
+| :---------------- | --------: | ---------: | -------------: | ------------: |
+| M.E. Peck         |     19409 |       2867 |           1900 |          1958 |
+| L.F. Henderson    |      6870 |       1941 |           1878 |          1987 |
+| Richard R. Halse  |      4496 |       1770 |           1973 |          2016 |
+| Georgia Mason     |      3138 |       1090 |           1956 |          1980 |
+| Lilla Leach       |      2919 |       1261 |           1908 |          1955 |
+| W.E. Lawrence     |      2492 |        913 |           1911 |          1947 |
+| L.E. Detling      |      2257 |        941 |           1928 |          1962 |
+| Orlin L. Ireland  |      1840 |        975 |           1927 |          1970 |
+| K.L. Chambers     |      1814 |        894 |           1946 |          2009 |
+| William H. Baker  |      1677 |        831 |           1927 |          1982 |
+| Thomas Howell     |      1418 |        913 |           1877 |          1899 |
+| W.C. Cusick       |      1265 |        687 |           1880 |          1918 |
+| Albert N. Steward |      1218 |        734 |           1920 |          1959 |
+| E.P. Sheldon      |      1167 |        632 |           1882 |          1908 |
+| LeRoy E. Detling  |      1094 |        600 |           1923 |          1964 |
+| Helen M. Gilkey   |       944 |        607 |           1904 |          1960 |
+| John B. Leiberg   |       900 |        651 |           1886 |          1910 |
+| H.C. Gilbert      |       882 |        386 |           1912 |          1961 |
+| S.C. Head         |       852 |        422 |           1950 |          1959 |
+| Charles G. Hansen |       839 |        474 |           1950 |          1957 |
 
 ## Sampling Biases
 
+Let’s look at spatial biases in sampling in three axes: spatial,
+temporal, and species
+
 ### Spatial
+
+Counties vary a lot in the number of specimens, over 9000 to less than
+500. This is pretty typical for an herbarium.
+
+Lane and Benton Counties are well represented, so are Harney, Wallowa,
+and
+Josephine.
 
 ![](OSC-Analysis_files/figure-gfm/Specimens_County-1.png)<!-- -->![](OSC-Analysis_files/figure-gfm/Specimens_County-2.png)<!-- -->
 
 Species diversity at the county level looks partly tied to the number of
 specimens. Counties with more specimens have more diversity. This
-suggests that sampling is incomplete at the county
-level.
+suggests that sampling is incomplete at the county level; we’d like to
+see diversity be independent of sampling.
 
 ![](OSC-Analysis_files/figure-gfm/Diversity_County-1.png)<!-- -->
 
 ### Temporal
 
+Show a fine-grained analysis of the number of specimens collected each
+year. There’s a lot of variation, but there’s been a reduction in the
+last five years or so.
+
 ![](OSC-Analysis_files/figure-gfm/Specimens_Year-1.png)<!-- -->
+
+Simplifying a bit, we can look at specimens by decade. The best sampling
+was 1910-1950. The 2010s is the lowest decade since the 1890s.
 
 ![](OSC-Analysis_files/figure-gfm/Specimens_Decade-1.png)<!-- -->
 
 ### Spatiotemporal
 
+We can also get a sense of specimens by decade by county to see if there
+are any spatiotemporal trends. For the most part, counties follow the
+broader temporal pattern. Multnomah, Klamath, and Marion have hardly
+been sampled in a long time.
+
 ![](OSC-Analysis_files/figure-gfm/Specimens_County_Decade-1.png)<!-- -->
+
+Focus on the six most-sampled
+counties
 
 ![](OSC-Analysis_files/figure-gfm/Specimens_County_Decade_Subset-1.png)<!-- -->
 
@@ -77,11 +152,6 @@ Of the 4500 species recorded, over 2000 less than 10 specimens
 statewide, and nearly 1000 species are only represented by 1-2
 specimens. These would be a good target, though it’s possible some are
 outdated names or something of that sort.
-
-Notably though, most of the undersampled species were collected
-recently. There are pockets of undersampled species that haven’t been
-collected recently in the CT River Valley, New London, and the NW corner
-that might be worth looking into.
 
 | Specimens | Species |
 | --------: | ------: |
@@ -98,40 +168,68 @@ that might be worth looking into.
 
 ![](OSC-Analysis_files/figure-gfm/Undersampled_Species-1.png)<!-- -->
 
+Another way that we can look at sampling across species is to add a time
+component and look for species that have not been collected in a long
+time.
+
+When we look at when each species was last collected, the median is
+1996, so half of the species have not been collected in about 25 years.
+There’s a significant proportion that have not been collected in over 50
+years too (1970).
+
+Again, these could be old names, but they could also be species that
+have become rare or extinct, or simply haven’t been looked for, because
+of inaccessibility or lack of taxonomic
+expertise.
+
 ![](OSC-Analysis_files/figure-gfm/Undersampled_Species_LastCollected-1.png)<!-- -->
 
-    ## # A tibble: 1 x 1
-    ##       n
-    ##   <int>
-    ## 1   755
+A dataset of species not collected in 50 years species, with the last
+year they were collected is available at
+[oldcollections.csv](/data/oldcollections.csv)
 
-![](OSC-Analysis_files/figure-gfm/Undersampled_Species_LastCollected-2.png)<!-- -->
+The actual number of species not collected in 50 years:
+
+| Species\_Not\_Collected\_In\_50\_Years |
+| -------------------------------------: |
+|                                    755 |
+
+Here’s a map of where species that have not been collected in 50 years
+were originally collected.
+
+![](OSC-Analysis_files/figure-gfm/LastCollected_Map-1.png)<!-- -->
 
 ### Common Species Temporal Sampling
 
+This shows temporal sampling for the 16 most common species in the
+herbarium
+
 ![](OSC-Analysis_files/figure-gfm/Common_Species_Herb-1.png)<!-- -->
+
+We can focus in on the three most common species. Also, I’ve included
+three tree species that are relatively common in the landscape for
+comparison.
 
 ![](OSC-Analysis_files/figure-gfm/Common_Species_Subset-1.png)<!-- -->
 
 ### Invasive Species Temporal Sampling
 
+Likewise, we can look at temporal sampling for some common invasives.
+These invasives are not well sampled at all, regardless of decade.
+They’re another possible focal point of targeted collecting.
+
 ![](OSC-Analysis_files/figure-gfm/Invasives-1.png)<!-- -->
 
 ## iNaturalist
 
+By comparison to the herbarium data, iNaturalist observations are
+growing exponentially.
+
+iNaturalist has collected more observations in Oregon in each of the
+last four years than the best year for the herbarium, and last year it
+was 60,000\!
+
 ![](OSC-Analysis_files/figure-gfm/iNat_Year-1.png)<!-- -->
-
-### Temporal
-
-show increase in sampling
-
-### Spatial
-
-show map
-
-### Invasives
-
-### Common Species
 
 ## Session Information
 

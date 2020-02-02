@@ -44,7 +44,9 @@ knitr::opts_chunk$set(warning = F, message = F, collapse = T, cache = T,
 
 ## Overview
 
-What is this analysis about?
+An exploratory analysis of the OSU herbarium's vascular plants.
+
+Primarily, we're concerned with understanding sampling in space, time, and across species. 
 
 ### Summary of Results
 * 
@@ -78,6 +80,7 @@ or.counties <- read_sf("data/shapefiles/county.shp")
 # @@@@@ ggPlot Theme
 # @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
+# Theme for plots
 ggplot.theme <- theme(
     
     # Text size for axis ticks
@@ -143,7 +146,7 @@ data <- data %>%
     
     # Select columns to keep
     select(OccurrenceID, Herbarium, Collection, Catalog, Family, Genus, 
-        ScientificName, Genus, SpecificEpithet, YearCollected, County, 
+        ScientificName, Genus, SpecificEpithet, Collector, YearCollected, County, 
         DecimalLatitude, DecimalLongitude, CoordinateUncertaintyInMeters) %>% 
     
     # Add a column for decade
@@ -171,13 +174,18 @@ data <- data %>%
         LastCollected = first(YearCollected, order_by = desc(YearCollected))
         )
 
+
+# Clean up the iNaturalist dataset
 inat <- inat %>%
   
+    # Select columns to keep
     select(observed_on, latitude, longitude, family = taxon_family_name, 
         species = taxon_species_name) %>%
   
-    mutate(year = format(as.POSIXct(observed_on, format = "%m/%d/%y"), 
+    # Make a column for year, derived from collection date
+    mutate(Year = format(as.POSIXct(observed_on, format = "%m/%d/%y"), 
         format = "%Y"))
+
 
 # Clean up the oregon counties shapefile
 or.counties <- or.counties %>% 
@@ -214,7 +222,11 @@ county.counts <- data %>%
 
 ## Summaries
 
-A summary of the number of families, species, and specimens represented, along with stats for the most common families
+### Species
+
+A summary of the number of families, species, and specimens represented, along with stats for the most common families. 
+
+The OSC herbarium has just over 4500 species of vascular plant in Oregon with good data.
 
 ```{r State_Summary, echo = F, comment = ""}
 
@@ -256,9 +268,11 @@ data %>%
     # Summarize the # of species and specimens by family
     summarize(Species = n(), Specimens = sum(Specimens)) %>%
     
+    # Arrange families by the # of specimens descending
     arrange(desc(Specimens)) %>%
     
-    filter(Specimens > 2000) %>%
+    # Show the top 20 families
+    head(20) %>%
 
     # Output a table of the data
     kable(format = "markdown")  
@@ -266,138 +280,293 @@ data %>%
 
 ```
 
+### Locations
+
+A map of all the specimen records to look at sampling intensity across space. 
+
+It looks like there's less sampling in the mountains, unsurprisingly. 
+
 ```{r State_Map, echo = F, comment = ""}
 
+# Map all specimen records
 data %>%
     ggplot() + 
+        
+        # Add the oregon counties outline
         geom_sf(data = or.counties, color = "black") + 
+  
+        # Add points for each specimen location
         geom_point(aes(x = DecimalLongitude, y = DecimalLatitude), 
             color = "darkgreen", size = 2, alpha = 0.3) +
+  
+        # Add cowplot minimal theme
         theme_cowplot() +
+  
+        # Ad custom theme
         ggplot.theme +
+  
+        # Add map theme
         map.theme
 
 ```
 
+### Collectors
 
-### Specimens and species by county
+A list of important collectors for Oregon specimens in OSC, with active dates.
 
+Morton Peck of WILLU tops the list (Manual of the Higher Plants of OR). Louis Henderson of UofO is second, and Richard Halse is third.
+
+Some great information on the background of these collectors is [here](https://bpp.oregonstate.edu/herbarium/databases/collectors-specimen-database).
+
+```{r Collectors, echo = F, comment = ""}
+
+# Parse out the important collectors
+data %>%
+    
+    # Count the number of specimens, first and last year for each collector
+    group_by(Collector) %>%
+    mutate(Specimens = n(), FirstAccession = min(YearCollected), 
+        LastAccession = max(YearCollected)) %>%
+    
+    # Group by collector & species, summarize to one row per species-collector
+    group_by(Collector, Species, Specimens, FirstAccession, 
+        LastAccession) %>%
+    summarize() %>%
+    
+    # Group by collector and summarize the number of species
+    group_by(Collector, Specimens, FirstAccession, LastAccession) %>%
+    summarize(NumSpecies = n()) %>%
+    
+    # Reorder columbns
+    select(Collector, Specimens, NumSpecies, FirstAccession, LastAccession) %>%
+    
+    # Arrange by the number of specimens descending
+    arrange(desc(Specimens)) %>%
+    
+    # Pick out the top 20 collectors
+    head(20) %>%
+    
+    # Output a table of the data
+    kable(format = "markdown")  
+
+```
 
 
 ## Sampling Biases
 
+Let's look at spatial biases in sampling in three axes: spatial, temporal, and species
+
 ### Spatial
 
+Counties vary a lot in the number of specimens, over 9000 to less than 500. This is pretty typical for an herbarium. 
+
+Lane and Benton Counties are well represented, so are Harney, Wallowa, and Josephine.
 
 ```{r Specimens_County, echo = F}
 
-
-
+# Bar graph of specimens by county
 county.counts %>%
+    
+    # Plot specimens against county ordered by # of specimens
     ggplot(aes(x = reorder(County, -Specimens), y = Specimens)) + 
+    
+        # Add bar graph
         geom_bar(stat = "identity", color = "darkgreen", fill = "darkgreen", 
           alpha = 0.2) + 
-        xlab("County") +
-        theme_cowplot() + 
-        ggplot.theme + 
+    
+        # Add x-axis label
+        labs(x = "County") +
+    
+        # Add cowplot minimal theme
+        theme_cowplot() +
+  
+        # Ad custom theme
+        ggplot.theme +
+  
         theme(axis.text.x = element_text(angle = 90, vjust = 0.2))
 
 
+# Add the number of specimens per county to the county shapefile
 or.counties %>% left_join(county.counts) %>%
-  ggplot() + 
     
-    # Add the outline of CT, with counties
-    geom_sf(aes(fill = Specimens), color = "black") + 
-    geom_sf_label(aes(label = County), size = 3, fontface = "bold") + 
-    scale_fill_gradient(low = "darkseagreen1", high = "darkgreen") +
+    # Make a map of the number of specimens by county
+    ggplot() + 
+    
+        # Color the counties by the number of specimens
+        geom_sf(aes(fill = Specimens), color = "black") + 
+    
+        # Add county name labels
+        geom_sf_label(aes(label = County), size = 3, fontface = "bold") + 
+    
+        # Set the color scale
+        scale_fill_gradient(low = "darkseagreen1", high = "darkgreen") +
 
-    theme_cowplot() +
-    ggplot.theme +
-    map.theme
+        # Add cowplot minimal theme
+        theme_cowplot() +
+  
+        # Ad custom theme
+        ggplot.theme +
+  
+        # Add map theme
+        map.theme
+
 
         
 ```
 
-Species diversity at the county level looks partly tied to the number of specimens. Counties with more specimens have more diversity. This suggests that sampling is incomplete at the county level. 
+Species diversity at the county level looks partly tied to the number of specimens. Counties with more specimens have more diversity. This suggests that sampling is incomplete at the county level; we'd like to see diversity be independent of sampling.
 
 ```{r Diversity_County, echo = F}
 
-or.counties %>%
-    left_join(county.counts) %>%
+# Add the number of specimens per county to the county shapefile
+or.counties %>% left_join(county.counts) %>%
+    
+    # Make a map of the number of species by county
     ggplot() + 
         
+        # Color the counties by the number of specimens
         geom_sf(aes(fill = TotalSpp), color = "black") + 
     
+        # Add county name labels
         geom_sf_label(aes(label = County), size = 3, fontface = "bold") + 
+    
+        # Set the color scale
         scale_fill_gradient(low = "darkseagreen1", high = "darkgreen") +
+    
+        # Add cowplot minimal theme
         theme_cowplot() +
+  
+        # Ad custom theme
         ggplot.theme +
+  
+        # Add map theme
         map.theme
+
 
 ```
 
 ### Temporal
 
+Show a fine-grained analysis of the number of specimens collected each year. There's a lot of variation, but there's been a reduction in the last five years or so.
+
 ```{r Specimens_Year, echo = F}
 
+# Show specimens by year
 data %>% 
+    
+    # Group by year and count up the number of specimens per year
     group_by(YearCollected) %>% 
     summarize(Specimens = n()) %>%
+    
+    # Plot the number of specimens by year collected
     ggplot(aes(x = YearCollected, y = Specimens)) + 
+    
+        # Add a bar plot
         geom_bar(stat = "identity", color = "darkgreen", fill = "darkgreen", 
             alpha = 0.2) + 
-        theme_cowplot() + 
+    
+        # Add cowplot minimal theme
+        theme_cowplot() +
+  
+        # Ad custom theme
         ggplot.theme
 
 
 ```
 
+Simplifying a bit, we can look at specimens by decade. The best sampling was 1910-1950. The 2010s is the lowest decade since the 1890s.
+
+
 ```{r Specimens_Decade, echo = F}
 
+# Show specimens by decade
 data %>% 
+    
+    # Group by decade and count up the number of specimens per decade
     group_by(Decade) %>% 
     summarize(Specimens = n()) %>%
+    
+    # Plot the number of specimens by decade
     ggplot(aes(x = Decade, y = Specimens)) + 
+    
+        # Add bar plot
         geom_bar(stat = "identity", color = "darkgreen", fill = "darkgreen", 
             alpha = 0.2) + 
-        theme_cowplot() + 
+    
+        # Add cowplot minimal theme
+        theme_cowplot() +
+  
+        # Ad custom theme
         ggplot.theme
+
 
 
 ```
 
 ### Spatiotemporal
 
+We can also get a sense of specimens by decade by county to see if there are any spatiotemporal trends. For the most part, counties follow the broader temporal pattern. Multnomah, Klamath, and Marion have hardly been sampled in a long time.
+
 ```{r Specimens_County_Decade, echo = F, fig.width = 12, fig.height = 9}
 
+# Show specimens by decade by county
 data %>% 
+    
+    # Group by decade and county, summarize the number of specimens per decade
     group_by(County, Decade) %>% 
     summarize(Specimens = n()) %>%
+    
+    # Plot the number of specimens per decade
     ggplot(aes(x = Decade, y = Specimens)) + 
+    
+        # Split up graph by county
         facet_wrap(~ County) +
+    
+        # Add barplot
         geom_bar(stat = "identity", color = "darkgreen", fill = "darkgreen", 
             alpha = 0.2) + 
-        theme_cowplot() + 
+        
+        # Limit the number of x-axis ticks
+        scale_x_continuous(breaks = c(1900,1950, 2000)) +
+    
+        # Add cowplot minimal theme
+        theme_cowplot() +
+  
+        # Ad custom theme
         ggplot.theme
-
-
 
 
 ```
 
+Focus on the six most-sampled counties
+
 ```{r Specimens_County_Decade_Subset, echo = F}
 
-data %>% filter(County %in% c("Lane", "Benton", "Harney",
-    "Linn", "Columbia", "Baker")) %>% 
-    group_by(County) %>%
-    mutate(Total = n()) %>%
-    group_by(County, Total, Decade) %>% 
+# Show specimens by decade for most common counties
+data %>% 
+    
+    # Filter to the six most common counties
+    filter(County %in% c("Lane", "Harney", "Wallowa", "Josephine", 
+        "Benton", "Jackson")) %>% 
+
+    # Group by decade and county, summarize the number of specimens per decade
+    group_by(County, Decade) %>% 
     summarize(Specimens = n()) %>%
+    
+    # Plot the number of specimens per decade
     ggplot(aes(x = Decade, y = Specimens)) + 
-        facet_wrap(~ reorder(County, -Total)) +
+    
+        # Split up graph by county
+        facet_wrap(~ reorder(County, -Specimens)) +
+    
+        # Add barplot
         geom_bar(stat = "identity", color = "darkgreen", fill = "darkgreen", 
             alpha = 0.2) + 
-        theme_cowplot() + 
+    
+        # Add cowplot minimal theme
+        theme_cowplot() +
+  
+        # Ad custom theme
         ggplot.theme
 
 ```
@@ -409,15 +578,15 @@ One way to get at data-deficient species, is to look at the number of species wi
 
 Of the 4500 species recorded, over 2000 less than 10 specimens statewide, and nearly 1000 species are only represented by 1-2 specimens. These would be a good target, though it's possible some are outdated names or something of that sort.
 
-Notably though, most of the undersampled species were collected recently. There are pockets of undersampled species that haven't been collected recently in the CT River Valley, New London, and the NW corner that might be worth looking into.
 
 ```{r Undersampled_Species, echo = F}
 
 # Filter to only include species with 10 or fewer specimens
 data %>% 
-    group_by(Species) %>%
     
-    summarize(Specimens = n()) %>%
+    # Summarize number of specimens per species
+    group_by(Species, Specimens) %>%
+    summarize() %>%
     
     filter(Specimens <= 10) %>%
     
@@ -432,76 +601,159 @@ data %>%
 
 
 
-
+# Graph the number of specimens per species
 data %>% 
     
+    # Summarize number of specimens per species
     group_by(Species) %>%
-    
     summarize(Specimens = n()) %>%
-    
-    # Group by the number of specimens
-    #group_by(Specimens) %>% 
-    
-    # Summarize the number of species with a certain number of specimens
-    #summarize(Species = n()) %>% 
-    
+
+    # Calculate the median specimens per species
     mutate(MedianSp = median(Specimens)) %>%
   
-    
+    # Plot histogram of specimens per species
     ggplot(aes(x = Specimens)) + 
-  
+        
+        # Add histogram  
         geom_histogram(bins = 30, fill = "darkgreen", color = "darkgreen", 
             alpha = 0.2) +
     
-        #geom_bar(stat = "identity") + 
-    
+        # Add median specimens per species
         geom_vline(aes(xintercept = MedianSp), color = "red", size = 1.2) +
-  
+        
+        # Add axis labels
         labs(x = "Number of Specimens", y = "Number of Species") +
-    
-        theme_cowplot() + 
+
+        # Add cowplot minimal theme
+        theme_cowplot() +
   
+        # Ad custom theme
+        ggplot.theme
+
+
+```
+
+Another way that we can look at sampling across species is to add a time component and look for species that have not been collected in a long time. 
+
+When we look at when each species was last collected, the median is 1996, so half of the species have not been collected in about 25 years. There's a significant proportion that have not been collected in over 50 years too (1970).
+
+Again, these could be old names, but they could also be species that have become rare or extinct, or simply haven't been looked for, because of inaccessibility or lack of taxonomic expertise.
+
+```{r Undersampled_Species_LastCollected, echo = F}
+
+data %>% 
+    
+    # Group by species, and summarize
+    group_by(Species, LastCollected, Specimens) %>%
+    summarize() %>% 
+    
+    # Ungroup
+    ungroup() %>%
+    
+    # Limit to species with 10 or fewer herbarium specimens
+    filter(Specimens <= 10) %>%
+    
+    # Calculate the median last collected year
+    mutate(MedianYr = median(LastCollected)) %>%
+    
+    # Plot the last collected date
+    ggplot(aes(x = LastCollected)) +
+    
+        # Add histogram
+        geom_histogram(bins = 30, color = "darkgreen", fill = "darkgreen", 
+              alpha = 0.2) + 
+
+        # Add labels
+        labs(x = "Last Year Collected", y = "Number of Species") +
+    
+        # Add median last collected date
+        geom_vline(aes(xintercept = MedianYr), color = "red", size = 1.2) +
+    
+        # Add cowplot minimal theme
+        theme_cowplot() +
+  
+        # Ad custom theme
         ggplot.theme
 
 
 ```
 
 
-```{r Undersampled_Species_LastCollected, echo = F}
 
+A dataset of species not collected in 50 years species, with the last year they were collected is available at [oldcollections.csv](/data/oldcollections.csv)
+
+The actual number of species not collected in 50 years:
+
+```{r LastCollected_Count, echo = F, comment = ""}
+
+# Compile a list of species that have not been collected in 50 years
 data %>% 
-    group_by(Species, LastCollected, Specimens) %>%
+    
+    # Group by Species and summarize
+    group_by(Family, Species, LastCollected, Specimens) %>%
     summarize() %>% 
-    ungroup() %>%
-    filter(Specimens <= 10) %>%
-    mutate(MedianYr = median(LastCollected)) %>%
-    ggplot(aes(x = LastCollected)) +
-        geom_histogram(bins = 30, color = "darkgreen", fill = "darkgreen", 
-              alpha = 0.2) + 
-        #geom_jitter(alpha = 0.5)
-        labs(x = "Last Year Collected", y = "Number of Species") +
-        geom_vline(aes(xintercept = MedianYr), color = "red", size = 1.2) +
-        theme_cowplot() + 
-        ggplot.theme
-
-
-# Number of species not collected in 50 years
-data %>% 
-    group_by(Species, LastCollected, Specimens) %>%
-    summarize() %>% 
+    
+    # Filter to only those species that haven't been collected in 50 years
     filter(LastCollected < 1970) %>% 
+    
+    # Ungroup
     ungroup() %>%
-    summarize(n = n())
+    
+    # Sort by family and then by species alphabetically
+    arrange(Family, Species) %>%
+
+    # Write the list of species to CSV
+    write.csv("data/oldcollections.csv", row.names = F)
 
 
+# Count the number of species not collected in 50 years
+data %>% 
+    
+    # Group by Species and summarize
+    group_by(Species, LastCollected, Specimens) %>%
+    summarize() %>% 
+    
+    # Filter to only those species that haven't been collected in 50 years
+    filter(LastCollected < 1970) %>% 
+    
+    # Ungroup
+    ungroup() %>%
+    
+    # Count the number of species
+    summarize(Species_Not_Collected_In_50_Years = n()) %>%
+    
+    # Output a table of the data
+    kable(format = "markdown")
+
+```
+
+Here's a map of where species that have not been collected in 50 years were originally collected.
+
+```{r LastCollected_Map, echo = F}
+
+# Show map of species not collected in 50 years
 data %>%
+    
+    # Filter to species not collected in 50 years
     filter(LastCollected < 1970) %>%
+    
+    # Plot map of where these species were collected
     ggplot() + 
+    
+        # Add oregon counties outline
         geom_sf(data = or.counties, color = "black") + 
+    
+        # Add points for specimens of these species
         geom_point(aes(x = DecimalLongitude, y = DecimalLatitude), 
             color = "darkgreen", size = 2, alpha = 0.6) +
+    
+        # Add cowplot minimal theme
         theme_cowplot() +
+  
+        # Ad custom theme
         ggplot.theme +
+  
+        # Add map theme
         map.theme
 
 
@@ -509,46 +761,91 @@ data %>%
 
 ### Common Species Temporal Sampling
 
+This shows temporal sampling for the 16 most common species in the herbarium
+
 ```{r Common_Species_Herb, echo = F, fig.width=12, fig.height=9}
 
 # 16 most common species in herbarium
 data %>% 
-    group_by(Family, Species) %>% 
-    mutate(Total = n()) %>%
-    arrange(desc(Total)) %>% 
-    group_by(Family, Species, Total, Decade) %>%
+    
+    # Group by species and find the total specimens per species
+    group_by(Species) %>% 
+    mutate(Total = n()) %>% 
+    
+    # Group by species and decade and count the number of specimens/species
+    group_by(Species, Total, Decade) %>%
     summarize(Specimens = n()) %>%
+    
+    # Arrange by total specimens per species descending
+    arrange(desc(Total)) %>% 
+    
+    # Only keep species with more than 200 specimens
     filter(Total > 200) %>%
+    
+    # Plot specimes by decade
     ggplot(aes(x = Decade, y = Specimens)) +
+        
+        # Facet by our target species
         facet_wrap(~ reorder(Species, -Total)) +
+    
+        # Add bar graph
         geom_bar(stat = "identity", color = "darkgreen", fill = "darkgreen", 
             alpha = 0.2) + 
+
+        # Add graph title
+        labs(title = "Most Common in OSC Herbarium") + 
+    
+        # Add cowplot minimal theme
         theme_cowplot() +
-        ggtitle("Most Common in OSC Herbarium") + 
+  
+        # Ad custom theme
         ggplot.theme + 
+
+        # Make species names italic in facet labels
         theme(strip.text = element_text(face = "bold.italic"))
 
 ```
 
+We can focus in on the three most common species. Also, I've included three tree species that are relatively common in the landscape for comparison.
 
 ```{r Common_Species_Subset, echo = F, fig.width=10, fig.height=7.5}
 
 # Subset of common/important species
 data %>% 
+    
+    # Filter to 1) three most common species and 2) important trees
     filter(Species %in% c("Poa secunda", "Eriophyllum lanatum", 
         "Potentilla gracilis", "Quercus garryana", "Acer macrophyllum", 
         "Pseudotsuga menziesii")) %>%
-    group_by(Family, Species) %>% 
+    
+    # Group by species and find the total specimens per species
+    group_by(Species) %>% 
     mutate(Total = n()) %>% 
-    group_by(Family, Species, Total, Decade) %>%
+    
+    # Group by species and decade and count the number of specimens/species
+    group_by(Species, Total, Decade) %>%
     summarize(Specimens = n()) %>%
+    
+    # Plot specimens by decade
     ggplot(aes(x = Decade, y = Specimens)) +
+    
+        # Facet by our target species
         facet_wrap(~ reorder(Species, -Total)) +
+    
+        # Add bar graph
         geom_bar(stat = "identity", color = "darkgreen", fill = "darkgreen", 
             alpha = 0.2) + 
+
+        # Add graph title
+        labs(title = "Common Species") +
+    
+        # Add cowplot minimal theme
         theme_cowplot() +
-        ggtitle("Common Species") + 
+  
+        # Ad custom theme
         ggplot.theme + 
+
+        # Make species names italic in facet labels
         theme(strip.text = element_text(face = "bold.italic"))
 
 
@@ -556,57 +853,82 @@ data %>%
 
 ### Invasive Species Temporal Sampling
 
+Likewise, we can look at temporal sampling for some common invasives. 
+These invasives are not well sampled at all, regardless of decade. They're another possible focal point of targeted collecting.
+
+
 ```{r Invasives, echo = F, fig.width=10, fig.height=7.5}
 
+# Plot of invasive species by decade
 data %>% 
+    
+    # Filter to include six invasive species
     filter(Species %in% c("Rubus armeniacus", "Geranium robertianum", 
         "Hedera helix", "Cytisus scoparius", "Brachypodium sylvaticum", 
         "Cirsium arvense")) %>%
-    group_by(Family, Species) %>% 
+    
+    # Group by species and find the total specimens per species
+    group_by(Species) %>% 
     mutate(Total = n()) %>% 
-    group_by(Family, Species, Total, Decade) %>%
+    
+    # Group by species and decade and count the number of specimens/species
+    group_by(Species, Total, Decade) %>%
     summarize(Specimens = n()) %>%
+
+    # Plot specimens by decade
     ggplot(aes(x = Decade, y = Specimens)) +
+    
+        # Facet by our target species
         facet_wrap(~ Species) +
+    
+        # Add bar graph
         geom_bar(stat = "identity", color = "darkgreen", fill = "darkgreen", 
             alpha = 0.2) + 
-        theme_cowplot() + 
+    
+        # Add cowplot minimal theme
+        theme_cowplot() +
+  
+        # Ad custom theme
         ggplot.theme + 
+
+        # Make species names italic in facet labels
         theme(strip.text = element_text(face = "bold.italic"))
 
 ```
 
 ## iNaturalist
 
+By comparison to the herbarium data, iNaturalist observations are growing exponentially. 
+
+iNaturalist has collected more observations in Oregon in each of the last four years than the best year for the herbarium, and last year it was 60,000!
+
 ```{r iNat_Year, echo = F}
 
+# Graph iNaturalist data by year
 inat %>% 
-    group_by(year) %>%
+    
+    # Group observations by year and count the number for each year
+    group_by(Year) %>%
     summarize(Observations = n()) %>%
-    filter(year > 2009, year < 2020) %>%
-    ggplot(aes(x = year, y = Observations)) + 
+    
+    # Filter to only the last 10 years
+    filter(Year > 2009, Year < 2020) %>%
+    
+    # Plot # of observations against year
+    ggplot(aes(x = Year, y = Observations)) + 
+    
+        # Add bar graph
         geom_bar(stat = "identity", color = "darkgreen", fill = "darkgreen", 
             alpha = 0.2) + 
-        labs(x = "Year") +
-        theme_cowplot() + 
+    
+        # Add cowplot minimal theme
+        theme_cowplot() +
+  
+        # Ad custom theme
         ggplot.theme
 
 
 ```
-
-
-### Temporal
-
-show increase in sampling
-
-### Spatial
-
-show map
-
-### Invasives
-
-
-### Common Species
 
 
 ## Session Information
