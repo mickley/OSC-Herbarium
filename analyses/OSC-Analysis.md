@@ -1,27 +1,63 @@
 OSC Herbarium
 ================
 James Mickley
-February 01, 2020
+February 02, 2020
+
+-   [Overview](#overview)
+    -   [Summary of Results](#summary-of-results)
+-   [Summaries](#summaries)
+    -   [Species](#species)
+    -   [Locations](#locations)
+    -   [Collectors](#collectors)
+-   [Sampling Biases](#sampling-biases)
+    -   [Spatial](#spatial)
+    -   [Temporal](#temporal)
+    -   [Spatiotemporal](#spatiotemporal)
+    -   [Undersampled Species](#undersampled-species)
+    -   [Common Species Temporal Sampling](#common-species-temporal-sampling)
+    -   [Invasive Species Temporal Sampling](#invasive-species-temporal-sampling)
+-   [iNaturalist](#inaturalist)
+-   [Session Information](#session-information)
 
 ## Overview
 
-An exploratory analysis of the OSU herbarium’s vascular plants.
+This is my exploratory analysis of the OSU herbarium’s vascular plants.
 
-Primarily, we’re concerned with understanding sampling in space, time,
-and across species.
+Primarily, I’m concerned with understanding sampling in space, time, and
+across species. But, it’s also an opportunity to explore the collection,
+looking at major collectors and plant families, and assessing which
+species are best represented.
 
 ### Summary of Results
 
-  - 
+  - There’s a lot of spatial variation in collecting intensity. Lane,
+    Benton, Harney, and Wallowa Counties stand out as the best-sampled
+    areas.
+  - The 1910-1950 era was when the bulk of the specimens were collected.
+    Collecting in the 2010s was particularly low.
+  - Collection through time was similar in most counties, though a few
+    have not had much activity since the 1950s.
+  - Of ~4500 total species in the dataset, half are represented by 12 or
+    fewer specimens. Nearly 1000 species are only represented by 1-2
+    specimens.
+  - 750 species have not been collected in 50 years.
+  - Even for the best-represented species in the herbarium, sampling has
+    been low since 1950.
+  - Common trees do not have much sampling at any point in time.
+  - Common invasive species have been mostly ignored by collectors, with
+    minimal sampling.
+  - By comparison, iNaturalist added 60,000 records in Oregon just in
+    2019\!
+
 ## Summaries
 
 ### Species
 
-A summary of the number of families, species, and specimens represented,
-along with stats for the most common families.
-
 The OSC herbarium has just over 4500 species of vascular plant in Oregon
-with good data.
+with good data (IDed to species, good location and date).
+
+Here’s a summary of the number of families, species, and specimens
+represented, along with stats for the most common families.
 
 | Families | Species | Specimens |
 | -------: | ------: | --------: |
@@ -95,37 +131,42 @@ Some great information on the background of these collectors is
 
 ## Sampling Biases
 
-Let’s look at spatial biases in sampling in three axes: spatial,
-temporal, and species
+Let’s look at biases or weaknesses in sampling in three axes: spatial,
+temporal, and across species.
 
 ### Spatial
 
-Counties vary a lot in the number of specimens, over 9000 to less than
-500. This is pretty typical for an herbarium.
+Counties vary a lot in the number of specimens, from over 9000 to less
+than 500. This is pretty typical for an herbarium.
 
 Lane and Benton Counties are well represented, so are Harney, Wallowa,
-and
-Josephine.
+and Josephine.
+
+This makes clear that some counties are badly in need of more sampling.
+Alternatively, one could focus on those well-sampled counties and
+maintain those
+datasets.
 
 ![](OSC-Analysis_files/figure-gfm/Specimens_County-1.png)<!-- -->![](OSC-Analysis_files/figure-gfm/Specimens_County-2.png)<!-- -->
 
 Species diversity at the county level looks partly tied to the number of
-specimens. Counties with more specimens have more diversity. This
-suggests that sampling is incomplete at the county level; we’d like to
-see diversity be independent of sampling.
+specimens. Counties with more specimens have more diversity.
+
+This suggests that sampling is incomplete at the county level; we’d like
+to see diversity be more independent of sampling.
 
 ![](OSC-Analysis_files/figure-gfm/Diversity_County-1.png)<!-- -->
 
 ### Temporal
 
-Show a fine-grained analysis of the number of specimens collected each
-year. There’s a lot of variation, but there’s been a reduction in the
-last five years or so.
+This shows a fine-grained analysis of the number of specimens collected
+each year. There’s a lot of variation, as collecting has ebbed and
+flowed, but there’s been a reduction in the last five years or so.
 
 ![](OSC-Analysis_files/figure-gfm/Specimens_Year-1.png)<!-- -->
 
 Simplifying a bit, we can look at specimens by decade. The best sampling
-was 1910-1950. The 2010s is the lowest decade since the 1890s.
+was in 1910-1950. The 2010s is the lowest decade since the 1890s.
 
 ![](OSC-Analysis_files/figure-gfm/Specimens_Decade-1.png)<!-- -->
 
@@ -133,38 +174,41 @@ was 1910-1950. The 2010s is the lowest decade since the 1890s.
 
 We can also get a sense of specimens by decade by county to see if there
 are any spatiotemporal trends. For the most part, counties follow the
-broader temporal pattern. Multnomah, Klamath, and Marion have hardly
-been sampled in a long time.
+broader temporal pattern. Multnomah, Klamath, Umatilla, and Marion have
+hardly been sampled in a long time, though.
 
 ![](OSC-Analysis_files/figure-gfm/Specimens_County_Decade-1.png)<!-- -->
 
-Focus on the six most-sampled
+Here, we focus on the six most-sampled
 counties
 
 ![](OSC-Analysis_files/figure-gfm/Specimens_County_Decade_Subset-1.png)<!-- -->
 
 ### Undersampled Species
 
-Undersampled Species One way to get at data-deficient species, is to
-look at the number of species with very few records.
+One way to get at data-deficient species, is to look at the number of
+species with very few records.
 
-Of the 4500 species recorded, over 2000 less than 10 specimens
-statewide, and nearly 1000 species are only represented by 1-2
-specimens. These would be a good target, though it’s possible some are
-outdated names or something of that sort.
+Of the 4500 species recorded, over 2000 are represented by less than 10
+specimens statewide (median 12 specimens per species), and nearly 1000
+species are only represented by 1-2 specimens. These would be a good
+target for further collecting, though it’s possible some are outdated
+names or something of that sort.
 
-| Specimens | Species |
-| --------: | ------: |
-|         1 |     591 |
-|         2 |     344 |
-|         3 |     259 |
-|         4 |     170 |
-|         5 |     149 |
-|         6 |     150 |
-|         7 |     130 |
-|         8 |     130 |
-|         9 |     104 |
-|        10 |      98 |
+Here’s a breakdown of the species with 10 or fewer specimens:
+
+| Species | Specimens |
+| ------: | --------: |
+|     591 |         1 |
+|     344 |         2 |
+|     259 |         3 |
+|     170 |         4 |
+|     149 |         5 |
+|     150 |         6 |
+|     130 |         7 |
+|     130 |         8 |
+|     104 |         9 |
+|      98 |        10 |
 
 ![](OSC-Analysis_files/figure-gfm/Undersampled_Species-1.png)<!-- -->
 
@@ -172,20 +216,20 @@ Another way that we can look at sampling across species is to add a time
 component and look for species that have not been collected in a long
 time.
 
-When we look at when each species was last collected, the median is
-1996, so half of the species have not been collected in about 25 years.
-There’s a significant proportion that have not been collected in over 50
-years too (1970).
+When we look at when each species was last collected, the median is year
+of last collection 1996, so half of the species have not been collected
+in about 25 years. There’s a significant proportion that have not been
+collected in over 50 years too (since 1970).
 
 Again, these could be old names, but they could also be species that
 have become rare or extinct, or simply haven’t been looked for, because
-of inaccessibility or lack of taxonomic
+of inaccessibility or because of lack of taxonomic
 expertise.
 
 ![](OSC-Analysis_files/figure-gfm/Undersampled_Species_LastCollected-1.png)<!-- -->
 
-A dataset of species not collected in 50 years species, with the last
-year they were collected is available at
+A dataset of the species that have not been collected in 50 years, with
+the last year they were collected is available at
 [oldcollections.csv](/data/oldcollections.csv)
 
 The actual number of species not collected in 50 years:
@@ -202,13 +246,19 @@ were originally collected.
 ### Common Species Temporal Sampling
 
 This shows temporal sampling for the 16 most common species in the
-herbarium
+herbarium.
+
+Again, they mostly follow the broader temporal trend, with sampling
+falling off post-1950.
 
 ![](OSC-Analysis_files/figure-gfm/Common_Species_Herb-1.png)<!-- -->
 
 We can focus in on the three most common species. Also, I’ve included
 three tree species that are relatively common in the landscape for
 comparison.
+
+Common trees really haven’t been sampled much. Even the really common
+species in the herbarium haven’t added many specimens in recent decades.
 
 ![](OSC-Analysis_files/figure-gfm/Common_Species_Subset-1.png)<!-- -->
 

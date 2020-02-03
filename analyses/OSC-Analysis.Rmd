@@ -44,12 +44,21 @@ knitr::opts_chunk$set(warning = F, message = F, collapse = T, cache = T,
 
 ## Overview
 
-An exploratory analysis of the OSU herbarium's vascular plants.
+This is my exploratory analysis of the OSU herbarium's vascular plants.
 
-Primarily, we're concerned with understanding sampling in space, time, and across species. 
+Primarily, I'm concerned with understanding sampling in space, time, and across species. But, it's also an opportunity to explore the collection, looking at major collectors and plant families, and assessing which species are best represented.
 
 ### Summary of Results
-* 
+* There's a lot of spatial variation in collecting intensity. Lane, Benton, Harney, and Wallowa Counties stand out as the best-sampled areas. 
+* The 1910-1950 era was when the bulk of the specimens were collected. Collecting in the 2010s was particularly low.
+* Collection through time was similar in most counties, though a few have not had much activity since the 1950s.
+* Of ~4500 total species in the dataset, half are represented by 12 or fewer specimens. Nearly 1000 species are only represented by 1-2 specimens.
+* 750 species have not been collected in 50 years.
+* Even for the best-represented species in the herbarium, sampling has been low since 1950.
+* Common trees do not have much sampling at any point in time.
+* Common invasive species have been mostly ignored by collectors, with minimal sampling.
+* By comparison, iNaturalist added 60,000 records in Oregon just in 2019!
+
 
 ```{r Main_Code, include = F, cache = F}
 
@@ -224,9 +233,11 @@ county.counts <- data %>%
 
 ### Species
 
-A summary of the number of families, species, and specimens represented, along with stats for the most common families. 
 
-The OSC herbarium has just over 4500 species of vascular plant in Oregon with good data.
+The OSC herbarium has just over 4500 species of vascular plant in Oregon with good data (IDed to species, good location and date).
+
+Here's a summary of the number of families, species, and specimens represented, along with stats for the most common families. 
+
 
 ```{r State_Summary, echo = F, comment = ""}
 
@@ -354,13 +365,15 @@ data %>%
 
 ## Sampling Biases
 
-Let's look at spatial biases in sampling in three axes: spatial, temporal, and species
+Let's look at biases or weaknesses in sampling in three axes: spatial, temporal, and across species.
 
 ### Spatial
 
-Counties vary a lot in the number of specimens, over 9000 to less than 500. This is pretty typical for an herbarium. 
+Counties vary a lot in the number of specimens, from over 9000 to less than 500. This is pretty typical for an herbarium. 
 
 Lane and Benton Counties are well represented, so are Harney, Wallowa, and Josephine.
+
+This makes clear that some counties are badly in need of more sampling. Alternatively, one could focus on those well-sampled counties and maintain those datasets.
 
 ```{r Specimens_County, echo = F}
 
@@ -383,6 +396,7 @@ county.counts %>%
         # Ad custom theme
         ggplot.theme +
   
+        # Change x-axis labeles to vertical
         theme(axis.text.x = element_text(angle = 90, vjust = 0.2))
 
 
@@ -414,7 +428,9 @@ or.counties %>% left_join(county.counts) %>%
         
 ```
 
-Species diversity at the county level looks partly tied to the number of specimens. Counties with more specimens have more diversity. This suggests that sampling is incomplete at the county level; we'd like to see diversity be independent of sampling.
+Species diversity at the county level looks partly tied to the number of specimens. Counties with more specimens have more diversity. 
+
+This suggests that sampling is incomplete at the county level; we'd like to see diversity be more independent of sampling.
 
 ```{r Diversity_County, echo = F}
 
@@ -447,7 +463,7 @@ or.counties %>% left_join(county.counts) %>%
 
 ### Temporal
 
-Show a fine-grained analysis of the number of specimens collected each year. There's a lot of variation, but there's been a reduction in the last five years or so.
+This shows a fine-grained analysis of the number of specimens collected each year. There's a lot of variation, as collecting has ebbed and flowed, but there's been a reduction in the last five years or so.
 
 ```{r Specimens_Year, echo = F}
 
@@ -474,7 +490,7 @@ data %>%
 
 ```
 
-Simplifying a bit, we can look at specimens by decade. The best sampling was 1910-1950. The 2010s is the lowest decade since the 1890s.
+Simplifying a bit, we can look at specimens by decade. The best sampling was in 1910-1950. The 2010s is the lowest decade since the 1890s.
 
 
 ```{r Specimens_Decade, echo = F}
@@ -505,7 +521,7 @@ data %>%
 
 ### Spatiotemporal
 
-We can also get a sense of specimens by decade by county to see if there are any spatiotemporal trends. For the most part, counties follow the broader temporal pattern. Multnomah, Klamath, and Marion have hardly been sampled in a long time.
+We can also get a sense of specimens by decade by county to see if there are any spatiotemporal trends. For the most part, counties follow the broader temporal pattern. Multnomah, Klamath, Umatilla, and Marion have hardly been sampled in a long time, though.
 
 ```{r Specimens_County_Decade, echo = F, fig.width = 12, fig.height = 9}
 
@@ -527,7 +543,7 @@ data %>%
             alpha = 0.2) + 
         
         # Limit the number of x-axis ticks
-        scale_x_continuous(breaks = c(1900,1950, 2000)) +
+        scale_x_continuous(breaks = c(1900, 2000)) +
     
         # Add cowplot minimal theme
         theme_cowplot() +
@@ -538,7 +554,7 @@ data %>%
 
 ```
 
-Focus on the six most-sampled counties
+Here, we focus on the six most-sampled counties
 
 ```{r Specimens_County_Decade_Subset, echo = F}
 
@@ -573,11 +589,11 @@ data %>%
 
 ### Undersampled Species
 
-Undersampled Species
 One way to get at data-deficient species, is to look at the number of species with very few records.
 
-Of the 4500 species recorded, over 2000 less than 10 specimens statewide, and nearly 1000 species are only represented by 1-2 specimens. These would be a good target, though it's possible some are outdated names or something of that sort.
+Of the 4500 species recorded, over 2000 are represented by less than 10 specimens statewide (median 12 specimens per species), and nearly 1000 species are only represented by 1-2 specimens. These would be a good target for further collecting, though it's possible some are outdated names or something of that sort.
 
+Here's a breakdown of the species with 10 or fewer specimens:
 
 ```{r Undersampled_Species, echo = F}
 
@@ -595,6 +611,9 @@ data %>%
     
     # Summarize the number of species with a certain number of specimens
     summarize(Species = n()) %>% 
+    
+    # Reorder columns
+    select(Species, Specimens) %>%
     
     # Output a table of the data
     kable(format = "markdown")
@@ -635,9 +654,9 @@ data %>%
 
 Another way that we can look at sampling across species is to add a time component and look for species that have not been collected in a long time. 
 
-When we look at when each species was last collected, the median is 1996, so half of the species have not been collected in about 25 years. There's a significant proportion that have not been collected in over 50 years too (1970).
+When we look at when each species was last collected, the median is year of last collection 1996, so half of the species have not been collected in about 25 years. There's a significant proportion that have not been collected in over 50 years too (since 1970).
 
-Again, these could be old names, but they could also be species that have become rare or extinct, or simply haven't been looked for, because of inaccessibility or lack of taxonomic expertise.
+Again, these could be old names, but they could also be species that have become rare or extinct, or simply haven't been looked for, because of inaccessibility or because of lack of taxonomic expertise.
 
 ```{r Undersampled_Species_LastCollected, echo = F}
 
@@ -679,8 +698,7 @@ data %>%
 ```
 
 
-
-A dataset of species not collected in 50 years species, with the last year they were collected is available at [oldcollections.csv](/data/oldcollections.csv)
+A dataset of the species that have not been collected in 50 years, with the last year they were collected is available at [oldcollections.csv](/data/oldcollections.csv)
 
 The actual number of species not collected in 50 years:
 
@@ -761,7 +779,9 @@ data %>%
 
 ### Common Species Temporal Sampling
 
-This shows temporal sampling for the 16 most common species in the herbarium
+This shows temporal sampling for the 16 most common species in the herbarium. 
+
+Again, they mostly follow the broader temporal trend, with sampling falling off post-1950.
 
 ```{r Common_Species_Herb, echo = F, fig.width=12, fig.height=9}
 
@@ -807,6 +827,8 @@ data %>%
 ```
 
 We can focus in on the three most common species. Also, I've included three tree species that are relatively common in the landscape for comparison.
+
+Common trees really haven't been sampled much. Even the really common species in the herbarium haven't added many specimens in recent decades. 
 
 ```{r Common_Species_Subset, echo = F, fig.width=10, fig.height=7.5}
 
